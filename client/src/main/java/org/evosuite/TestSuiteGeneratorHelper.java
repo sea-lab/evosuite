@@ -86,6 +86,9 @@ public class TestSuiteGeneratorHelper {
       case METHODNOEXCEPTION:
         LoggingUtils.getEvoLogger().info("  - No-Exception Top-Level Method Coverage");
         break;
+      case METHODPAIR:
+        LoggingUtils.getEvoLogger().info("  - Method-Pair Coverage");
+        break;
       case LINE:
         LoggingUtils.getEvoLogger().info("  - Line Coverage");
         break;
