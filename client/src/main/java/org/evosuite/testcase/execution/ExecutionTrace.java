@@ -27,6 +27,7 @@ import java.util.*;
 import org.evosuite.coverage.dataflow.DefUse;
 import org.evosuite.setup.CallContext;
 import org.evosuite.testcase.execution.ExecutionTraceImpl.BranchEval;
+import org.objectweb.asm.Type;
 
 /**
  * This interface defines the trace data that is collected during execution.
@@ -358,7 +359,7 @@ public interface ExecutionTrace {
 	 * @param caller
 	 *            a {@link java.lang.Object} object.
 	 */
-	public void enteredMethod(String className, String methodName, Object caller);
+	public void enteredMethod(String className, String methodName, Object caller, String partialMethodName, Object[] args);
 
 	/**
 	 * Pop last method call from stack

@@ -30,6 +30,7 @@ import java.util.Set;
 import org.evosuite.coverage.dataflow.DefUse;
 import org.evosuite.setup.CallContext;
 import org.evosuite.testcase.execution.ExecutionTraceImpl.BranchEval;
+import org.objectweb.asm.Type;
 
 /**
  * <p>
@@ -124,9 +125,9 @@ public class ExecutionTraceProxy implements ExecutionTrace, Cloneable {
 	 */
 	/** {@inheritDoc} */
 	@Override
-	public void enteredMethod(String className, String methodName, Object caller) {
+	public void enteredMethod(String className, String methodName, Object caller, String partialMethodName, Object args[]) {
 		copyOnWrite();
-		trace.enteredMethod(className, methodName, caller);
+		trace.enteredMethod(className, methodName, caller, partialMethodName, args);
 	}
 
 	/*

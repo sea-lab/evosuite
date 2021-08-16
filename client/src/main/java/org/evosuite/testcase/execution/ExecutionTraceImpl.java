@@ -19,17 +19,8 @@
  */
 package org.evosuite.testcase.execution;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.evosuite.Properties;
 import org.evosuite.TestGenerationContext;
@@ -44,6 +35,7 @@ import org.evosuite.setup.CallContext;
 import org.evosuite.statistics.RuntimeVariable;
 import org.evosuite.utils.ArrayUtil;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,6 +194,11 @@ public class ExecutionTraceImpl implements ExecutionTrace, Cloneable {
 	public Map<Integer, Integer> coveredFalse = Collections.synchronizedMap(new HashMap<Integer, Integer>());
 
 	public Map<String, Integer> coveredMethods = Collections.synchronizedMap(new HashMap<String, Integer>());
+
+	public List<Object> enteredMethodsName = Collections.synchronizedList(new ArrayList<Object>());
+	public List<Object> enteredMethodsArgs = Collections.synchronizedList(new ArrayList<Object>());
+	public String methodSignature = "";
+	public List<String> enteredMethodsSignature = Collections.synchronizedList(new ArrayList<>());
 
 	public Map<String, Integer> coveredBranchlessMethods = Collections.synchronizedMap(new HashMap<String, Integer>());
 
@@ -677,13 +674,70 @@ public class ExecutionTraceImpl implements ExecutionTrace, Cloneable {
 		duCounter++;
 	}
 
+	private String getClassName(org.objectweb.asm.Type type) {
+		switch (type.getSort()) {
+			case 0:
+				return "<NO_ARG>";
+			case 1:
+				return "Boolean";
+			case 2:
+				return "Char";
+			case 3:
+				return "Byte";
+			case 4:
+				return "Short";
+			case 5:
+				return "Integer";
+			case 6:
+				return "Float";
+			case 7:
+				return "Long";
+			case 8:
+				return "Double";
+			case 9:
+				StringBuilder sb = new StringBuilder(type.getElementType().getClassName());
+
+				for (int i = type.getDimensions(); i > 0; --i) {
+					sb.append("[]");
+				}
+
+				return sb.toString();
+			case 10:
+				return type.getClassName().substring(type.getClassName().lastIndexOf(".") + 1);
+			default:
+				return null;
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
 	 * Add a new method call to stack
 	 */
 	@Override
-	public void enteredMethod(String className, String methodName, Object caller) {
+	public void enteredMethod(String className, String methodName, Object caller, String partialMethodName, Object args[]) {
+		System.out.println("Entered Method:");
+		enteredMethodsName.add(className + " " + methodName);
+		enteredMethodsArgs.addAll(Arrays.asList(args));
+
+		String typesString = partialMethodName+" (";
+        if (args.length == 0) {
+            typesString += "<NO_PARAM>";
+        }
+        for (int i = 0; i < args.length; i++) {
+            typesString = typesString + getClassName(Type.getType(args[i].getClass())) +" ";
+            if (i != args.length - 1) {
+                typesString += "<NEXT_PARAM>";
+            }
+//            System.out.println(args[i].getClassName());
+//            System.out.println(getClassName(types[i]));
+            System.out.println("-----------------");
+        }
+
+		methodSignature = typesString + ")";
+        enteredMethodsSignature.add(methodSignature);
+//		System.out.println(methodSignature);
+//		System.err.println("ERROR");
 		if (traceCoverage) {
 			String id = className + "." + methodName;
 			if (!coveredMethods.containsKey(id)) {

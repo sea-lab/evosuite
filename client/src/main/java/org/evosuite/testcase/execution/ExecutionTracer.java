@@ -21,6 +21,7 @@ package org.evosuite.testcase.execution;
 
 import java.util.Map;
 
+import jdk.internal.org.objectweb.asm.Type;
 import org.evosuite.coverage.dataflow.DefUsePool;
 import org.evosuite.coverage.dataflow.Definition;
 import org.evosuite.coverage.dataflow.Use;
@@ -259,7 +260,7 @@ public class ExecutionTracer {
 	 * @throws org.evosuite.testcase.execution.TestCaseExecutor$TimeoutExceeded
 	 *             if any.
 	 */
-	public static void enteredMethod(String classname, String methodname, Object caller)
+	public static void enteredMethod(String classname, String methodname, Object caller, String partialMethodName, Object[] args)
 	        throws TestCaseExecutor.TimeoutExceeded {
 		ExecutionTracer tracer = getExecutionTracer();
 
@@ -271,8 +272,7 @@ public class ExecutionTracer {
 
 		checkTimeout();
 
-		//logger.trace("Entering method " + classname + "." + methodname);
-		tracer.trace.enteredMethod(classname, methodname, caller);
+		tracer.trace.enteredMethod(classname, methodname, caller, partialMethodName, args);
 	}
 
 	/**
